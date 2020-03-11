@@ -82,7 +82,7 @@ meta:可能为null, 也可能为json， 见下述orders.
 新增      
  订单详情Info, 下述type与reduceOnly同一级别:      
  "reduceOnly": false,  ////!<是否只减仓 ，为 true 显示 “只减仓”           
-  type = FOK ////!<全部成交或取消      
+   type = FOK ////!<全部成交或取消      
    type = IOC ////!<立即成交或取消                           
    type = POST_ONLY ////!<被动      
    type = LIMIT  ////!< 限价      
@@ -181,7 +181,7 @@ btc结算  精度取4位
 
 
 
-## 四 订单深度推送      
+## 四、 订单深度推送      
 
 {      
     "to": 26075091, ////!<标记推送顺序      
@@ -215,4 +215,112 @@ if from == 0 { ////!<全量数据
 }else { ////!< 增量推送      
      lastTo = to      
      数据处理      
-}      
+}  
+
+
+
+
+## 五、 交易
+post:  /orders
+{    
+"size": 200,    
+"symbol": "BTCUSD",    
+"type": "LIMIT",    
+"side": "BUY",    
+"price": 3750.5,    
+"reduceOnly": False,    
+"conditional": {    
+    "type": "REACH",    
+    "price": 3750.5,    
+    "priceType": "MARKET_PRICE"    
+}}                                                 
+
+POST_ONLY: 被动
+### 1、限价下单    
+订单类型  type:      
+   FOK ////!<全部成交或取消   
+   IOC ////!<立即成交或取消   
+   POST_ONLY ////!<被动，当选中 POST_ONLY 开启是，生效时间默认为"一直有效至取消"，不可更改      
+   LIMIT ////!< 一直有效至取消  
+ 
+symbol: BTCUSD ///!<合约种类     
+size = 200     ///!<下单数量    
+side = BUY   ////!<交易方向， BUY : 买； SELL: 卖    
+reduceOnly =  False  ////!< true开启"只减仓"; False：关闭"只减仓"    
+
+### 2、市价下单    
+symbol: BTCUSD ///!<合约种类     
+size = 200     ///!<下单数量    
+side = BUY   ////!<交易方向， BUY : 买； SELL: 卖    
+reduceOnly =  False  ////!< true开启"只减仓"; False：关闭"只减仓"    
+
+### 3、触发下单      
+
+////!<下述触发条件，可解释为：当市场价格达到3750.5触发
+"conditional": {    
+    "type": "REACH",    ////!<价格达到触发条件，该字段写死
+    "price": 3750.5,      ////!<触发价格   
+    "priceType": "MARKET_PRICE"  
+    ////!<  触发类型:       
+    MARKET_PRICE:市场价格；      
+    MARK_PRICE:   标记价格；      
+    INDEX_PRICE：指数价格   
+}}   
+
+
+#### 限价触发
+
+订单type类型:
+FOK ////!<全部成交或取消       
+IOC ////!<立即成交或取消        
+POST_ONLY ////!<被动，当选中 POST_ONLY 开启是，生效时间默认为"一直有效至取消"，不可更改           
+LIMIT ////!<限价触发 一直有效至取消     
+
+symbol: BTCUSD ///!<合约种类          
+size = 200     ///!<下单数量         
+price = 8800  ////!<限价交易价格
+side = BUY   ////!<交易方向， BUY : 买； SELL: 卖         
+reduceOnly =  False  ////!< true开启"只减仓"; False：关闭"只减仓"         
+
+
+#### 市价触发   
+
+订单type类型:    
+MARKET ////!<市价触发  
+
+symbol: BTCUSD ///!<合约种类          
+size = 200     ///!<下单数量   
+side = BUY   ////!<交易方向， BUY : 买； SELL: 卖         
+price = ""  ///!< 可不传   
+reduceOnly =  False  ////!< true开启"只减仓"; False：关闭"只减仓"         
+
+
+### 4、平仓订单   
+
+#### 限价平仓，属于限价下单的一种   
+
+订单type类型:   
+LIMIT ////!<限价触发 一直有效至取消     
+
+symbol: BTCUSD ///!<合约种类          
+size = 200     ///!<下单数量           
+price = 8800  ////!<限价交易价格    
+side = BUY   ////!<交易方向， BUY : 买； SELL: 卖          
+reduceOnly =  True  ////!< true开启"只减仓"   
+
+
+#### 市价平仓   
+
+订单type类型:   
+MARKET  ////!<限价触发 一直有效至取消     
+
+symbol: BTCUSD ///!<合约种类          
+size = 200     ///!<下单数量         
+price = ""  ////!<可不传   
+side = BUY   ////!<交易方向， BUY : 买； SELL: 卖         
+reduceOnly =  True  ////!< true开启"只减仓"   
+
+
+
+### 5、止盈止损    
+
