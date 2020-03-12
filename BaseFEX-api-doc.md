@@ -324,3 +324,70 @@ reduceOnly =  True  ////!< true开启"只减仓"
 
 ### 5、止盈止损    
 
+
+
+
+##  六、深度挂单
+
+{    
+  "to": 26075091, ////!<标记推送顺序    
+  "bestPrices": {    
+    "ask": 7899,    
+    "bid": 7898.5    
+  },    
+  "lastPrice": 7900.5,     
+  "bids": { ///!<  买单   
+    "7893.5": 9442,    
+    "7892.5": 6994,    
+     …..    
+    "7897": 7678,    
+    "7896.5": 6201    
+  },    
+  "asks": {  ////!<卖单    
+    "7902": 9280,    
+    …..    
+    "7904.5": 10685,    
+    "7903": 6262    
+  },    
+  "from": 0 ////!<标记推送顺序    
+}   
+
+
+### 1.推送异常判断逻辑     
+
+第一次推送的 from为0，全量推送     
+
+if from == 0 { ////!<全量数据     
+  lastTo = to ////!<上一次推送的to     
+}else if  from > lastTo + 1 {     
+   数据有问题，需要重新订阅     
+}else { ////!< 增量推送     
+     lastTo = to     
+     数据处理     
+}     
+
+
+
+### 2.计算深度百分比(忽略价格因素）       
+
+var sum:Int = 0 ////!<数量总和      
+var sumArray:[Int] = [0] ////!<数据累加和组     
+let count =  dataArrays.count ///!<数据源个数     
+for index  in 0..<count {     
+     let model =  dataArrays[index] ////!<模型化数据源     
+     sum = sum + model.value     
+     sumArray.append(sum)     
+}     
+
+var models:DepthModel = [ ]( ) ////!<显示模型     
+for index in 0..<count {     
+   let model =   dataArrays[index]     
+   let value = sumArray[index]     
+   let percent = value / sum ////!<百分比     
+   model.percent =  percent     
+   models.append(model)      
+}     
+
+
+
+
